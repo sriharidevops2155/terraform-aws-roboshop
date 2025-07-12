@@ -11,7 +11,7 @@ resource "aws_lb_target_group" "main" {
     path = local.health_check
     port = local.tg_port
     timeout = 2
-    unhealthy_threshold = 5
+    unhealthy_threshold = 3
   }
 }
 
@@ -133,7 +133,7 @@ resource "aws_autoscaling_group" "main" {
   min_size           = 1
   target_group_arns = [aws_lb_target_group.main.arn] #arns Amazon Resource Name
   vpc_zone_identifier = local.private_subnet_ids
-  health_check_grace_period = 300
+  health_check_grace_period = 120
   health_check_type         = "ELB"
   
   launch_template {
@@ -155,7 +155,7 @@ resource "aws_autoscaling_group" "main" {
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      min_healthy_percentage = 70
+      min_healthy_percentage = 50
     }
     triggers = ["launch_template"]
   }
